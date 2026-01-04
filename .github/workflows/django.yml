@@ -1,0 +1,91 @@
+name: Django CI
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+    branches: ["main", "master"]
+
+jobs:
+  # Job 1: Test Integration using Docker Compose
+  test:
+    name: Test Integration
+    runs-on: [self-hosted, Linux, X64]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Create Test .env
+        run: |
+          # Create a dedicated .env for testing
+          echo "DB_NAME=db_test" > .env.test
+          echo "DB_USER=user_test" >> .env.test
+          echo "DB_PASSWORD=password_test" >> .env.test
+          echo "REDIS_PASSWORD=redis_test_pass" >> .env.test
+          echo "SECRET_KEY=django-insecure-ci-test-key" >> .env.test
+          echo "DEBUG=True" >> .env.test
+          echo "ALLOWED_HOSTS=*" >> .env.test
+          echo "GEMINI_API_KEY=mock-key" >> .env.test
+
+      - name: Start Test Environment
+        run: |
+          echo "Starting Docker Compose for Test..."
+          # Use a different project name (-p finance_test) to avoid conflict with production
+          # Pass .env.test as the environment file
+          docker compose -p finance_test --env-file .env.test up -d --build
+
+      - name: Wait for Services
+        run: |
+          echo "Waiting for database..."
+          sleep 10
+
+      - name: Run Tests
+        run: |
+          # Execute tests inside the running 'web' container
+          docker compose -p finance_test exec -T web python manage.py migrate
+          docker compose -p finance_test exec -T web python manage.py init_access_code 1234
+          # Run pytest inside container
+          docker compose -p finance_test exec -T web pytest tests/
+
+      - name: Cleanup Test Environment
+        if: always() # Run even if tests fail
+        run: |
+          echo "Cleaning up..."
+          docker compose -p finance_test down -v --rmi local
+
+  # Job 2: Deploy to Production
+  deploy:
+    name: Deploy to Production
+    needs: test
+    runs-on: [self-hosted, Linux, X64]
+    environment: production # Use GitHub Environment
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Production Env
+        run: |
+          # Use secrets from the 'production' environment
+          if [ -n "${{ secrets.ENV_FILE }}" ]; then
+            echo "${{ secrets.ENV_FILE }}" > .env
+            echo "Loaded production configuration."
+          else
+            echo "WARNING: Missing production configuration"
+          fi
+
+      - name: Deploy with Docker Compose
+        run: |
+          # Restart main project (default name)
+          docker compose down || true
+          docker compose up -d --build
+
+      - name: Post-Deployment Tasks
+        run: |
+          echo "Waiting..."
+          sleep 10
+          docker compose exec -T web python manage.py migrate
+          docker compose exec -T web python manage.py collectstatic --noinput
+          docker image prune -f
