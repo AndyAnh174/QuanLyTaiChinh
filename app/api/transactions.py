@@ -43,11 +43,44 @@ class TransactionOut(BaseModel):
 
 
 @router.get("", response=List[TransactionOut], summary="List all transactions")
-def list_transactions(request, limit: int = 50, offset: int = 0):
-    """Get all transactions with pagination"""
-    transactions = Transaction.objects.select_related('wallet', 'category').all()[
-        offset:offset+limit
-    ]
+def list_transactions(
+    request, 
+    limit: int = 50, 
+    offset: int = 0,
+    start_date: str = None,
+    end_date: str = None,
+    wallet_id: int = None,
+    transaction_type: str = None,
+    category_id: int = None
+):
+    """
+    Get all transactions with filtering and pagination.
+    Dates should be in ISO format (YYYY-MM-DD).
+    """
+    qs = Transaction.objects.select_related('wallet', 'category').all()
+    
+    # Apply Filters
+    if start_date:
+        qs = qs.filter(date__gte=start_date)
+    if end_date:
+        # If end_date is just YYYY-MM-DD, we should include the whole day
+        # If it has time, exact match
+        if len(end_date) == 10:  # Date only
+            qs = qs.filter(date__date__lte=end_date)
+        else:
+            qs = qs.filter(date__lte=end_date)
+            
+    if wallet_id:
+        qs = qs.filter(wallet_id=wallet_id)
+        
+    if transaction_type:
+        qs = qs.filter(transaction_type=transaction_type)
+        
+    if category_id:
+        qs = qs.filter(category_id=category_id)
+        
+    transactions = qs[offset:offset+limit]
+    
     return [
         {
             "id": t.id,

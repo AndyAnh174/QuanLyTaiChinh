@@ -63,8 +63,29 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initial Load if List is active
     if (listTab && listTab.classList.contains('active')) {
         loadTransactions();
+        // Populate filter wallet select
+        loadReferenceDataForFilter();
     }
 });
+
+async function loadReferenceDataForFilter() {
+    try {
+        const response = await fetch('/api/v1/wallets');
+        if (!response.ok) return;
+        const wallets = await response.json();
+        const select = document.getElementById('filterWallet');
+        if (!select) return;
+        
+        // Keep first option
+        const firstOption = select.options[0];
+        select.innerHTML = '';
+        select.appendChild(firstOption);
+        
+        wallets.forEach(w => {
+            select.innerHTML += `<option value="${w.id}">${w.name}</option>`;
+        });
+    } catch(e) { console.error(e); }
+}
 
 /* --- API Functions --- */
 
@@ -78,7 +99,19 @@ async function loadTransactions() {
     `;
     
     try {
-        const response = await fetch('/api/v1/transactions');
+        // Build URL with filters
+        const startDate = document.getElementById('filterStartDate')?.value;
+        const endDate = document.getElementById('filterEndDate')?.value;
+        const walletId = document.getElementById('filterWallet')?.value;
+        const type = document.getElementById('filterType')?.value;
+        
+        const params = new URLSearchParams();
+        if (startDate) params.append('start_date', startDate);
+        if (endDate) params.append('end_date', endDate);
+        if (walletId) params.append('wallet_id', walletId);
+        if (type) params.append('transaction_type', type);
+        
+        const response = await fetch(`/api/v1/transactions?${params.toString()}`);
         const transactions = await response.json();
         renderTransactions(transactions);
     } catch (error) {
@@ -137,6 +170,16 @@ function renderTransactions(transactions) {
     
     html += `</tbody></table></div>`;
     container.innerHTML = html;
+    html += `</tbody></table></div>`;
+    container.innerHTML = html;
+}
+
+function resetFilters() {
+    document.getElementById('filterStartDate').value = '';
+    document.getElementById('filterEndDate').value = '';
+    document.getElementById('filterWallet').value = '';
+    document.getElementById('filterType').value = '';
+    loadTransactions();
 }
 
 async function loadReferenceData() {

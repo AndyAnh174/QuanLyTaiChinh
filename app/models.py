@@ -240,6 +240,43 @@ class Transaction(models.Model):
     
     def __str__(self):
         return f"{self.get_transaction_type_display()} - {self.amount:,.0f} VNĐ - {self.description[:50]}"
+
+
+class ChatSession(models.Model):
+    """Phiên chat với AI"""
+    title = models.CharField(max_length=200, default="New Chat", verbose_name="Tiêu đề")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Chat Session"
+        verbose_name_plural = "Chat Sessions"
+        ordering = ['-updated_at']
+        
+    def __str__(self):
+        return self.title
+
+
+class ChatMessage(models.Model):
+    """Tin nhắn trong phiên chat"""
+    ROLE_CHOICES = [
+        ('user', 'User'),
+        ('assistant', 'Assistant'),
+        ('system', 'System')
+    ]
+    
+    session = models.ForeignKey(ChatSession, on_delete=models.CASCADE, related_name='messages', verbose_name="Phiên chat")
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, verbose_name="Vai trò")
+    content = models.TextField(verbose_name="Nội dung")
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Chat Message"
+        verbose_name_plural = "Chat Messages"
+        ordering = ['created_at']
+        
+    def __str__(self):
+        return f"{self.role}: {self.content[:50]}"
     
 
 

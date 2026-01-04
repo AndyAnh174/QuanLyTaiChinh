@@ -11,11 +11,13 @@ router = Router(tags=["chat"])
 
 class ChatRequest(BaseModel):
     question: str
+    session_id: Optional[int] = None
 
 
 class ChatResponse(BaseModel):
     answer: str
     question: str
+    session_id: Optional[int] = None
 
 
 @router.post("/ask", response=ChatResponse, summary="Ask question about financial data")
@@ -25,14 +27,16 @@ def ask_question(request, data: ChatRequest):
     Uses RAG to query database and generate response.
     """
     try:
-        answer = rag_service.query_financial_data(data.question)
+        result = rag_service.query_financial_data(data.question, data.session_id)
         return {
-            "answer": answer,
+            "answer": result["answer"],
+            "session_id": result["session_id"],
             "question": data.question
         }
     except Exception as e:
         return {
             "answer": f"Xin lỗi, tôi không thể trả lời câu hỏi này. Lỗi: {str(e)}",
-            "question": data.question
+            "question": data.question,
+            "session_id": data.session_id
         }
 

@@ -413,7 +413,7 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script src="{% static 'js/chat.js' %}"></script>
+<script src="{% static 'js/chat.js' %}?v={{ now|date:'U' }}"></script>
 <script>
     // Quick inline script to load balance for sidebar
     document.addEventListener('DOMContentLoaded', async () => {
@@ -429,13 +429,10 @@
 
     function clearChat() {
         if(confirm("Xóa lịch sử chat hiện tại?")) {
-            const msgs = document.getElementById('chatMessages');
-            msgs.innerHTML = `
-                <div class="message ai">
-                    <div class="avatar ai-avatar"><i class="bi bi-stars"></i></div>
-                    <div class="message-content">Đã xóa lịch sử chat. Bạn cần hỗ trợ gì thêm không?</div>
-                </div>
-            `;
+            // Clear session ID to start fresh
+            localStorage.removeItem('chat_session_id');
+            // Reload page to reset state (simplest way to reset JS variable too)
+            window.location.reload(); 
         }
     }
 </script>

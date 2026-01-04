@@ -141,6 +141,40 @@
                     </div>
                 </div>
                 <div class="card-body">
+                    <!-- Filters -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold">Từ ngày</label>
+                            <input type="date" class="form-control form-control-sm" id="filterStartDate">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold">Đến ngày</label>
+                            <input type="date" class="form-control form-control-sm" id="filterEndDate">
+                        </div>
+                        <div class="col-md-3">
+                             <label class="form-label small fw-bold">Ví</label>
+                             <select class="form-select form-select-sm" id="filterWallet">
+                                 <option value="">-- Tất cả ví --</option>
+                             </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold">Loại</label>
+                            <select class="form-select form-select-sm" id="filterType">
+                                <option value="">-- Tất cả loại --</option>
+                                <option value="income">Thu nhập</option>
+                                <option value="expense">Chi tiêu</option>
+                            </select>
+                        </div>
+                        <div class="col-12 d-flex justify-content-end">
+                             <button class="btn btn-primary btn-sm" onclick="loadTransactions()">
+                                <i class="bi bi-funnel"></i> Áp dụng bộ lọc
+                             </button>
+                             <button class="btn btn-outline-secondary btn-sm ms-2" onclick="resetFilters()">
+                                <i class="bi bi-x-circle"></i> Xóa lọc
+                             </button>
+                        </div>
+                    </div>
+
                     <div id="transactionsContainer">
                         <div class="text-center py-5">
                             <div class="spinner-border text-primary" role="status">

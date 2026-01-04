@@ -6,6 +6,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatMessages = document.getElementById('chatMessages');
     const typingIndicator = document.getElementById('typingIndicator');
     
+    // Track Session ID
+    let currentSessionId = localStorage.getItem('chat_session_id') ? parseInt(localStorage.getItem('chat_session_id')) : null;
+    
     // Auto focus input
     userInput.focus();
     
@@ -24,15 +27,27 @@ document.addEventListener('DOMContentLoaded', () => {
         
         try {
             // Call API
+            const payload = { 
+                question: message,
+                session_id: currentSessionId 
+            };
+            
             const response = await fetch('/api/v1/chat/ask', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ question: message })
+                body: JSON.stringify(payload)
             });
             
             const data = await response.json();
+            
+            // Provide Feedback if session created
+            if (data.session_id && currentSessionId !== data.session_id) {
+                currentSessionId = data.session_id;
+                // Optional: Save to localStorage to persist across refreshes if desired
+                localStorage.setItem('chat_session_id', currentSessionId);
+            }
             
             // Hide Typing
             showTyping(false);

@@ -29,25 +29,47 @@ Rules:
 
 Data provided will be in JSON format. Use it to answer the user's question accurately."""
 
-    def query_financial_data(self, question: str) -> str:
+    def query_financial_data(self, question: str, session_id: int = None) -> Dict[str, Any]:
         """
-        Query financial data and generate natural language response
+        Query financial data and generate natural language response with session history.
         
         Args:
             question: User's natural language question
+            session_id: Optional ID of the existing chat session
         
         Returns:
-            Natural language response
+            Dictionary containing answer and session_id
         """
-        # Parse question to determine what data to fetch
-        data_context = self._extract_data_context(question)
+        from ..models import ChatSession, ChatMessage
         
-        # Format context for LLM
+        # Get or Create Session
+        if session_id:
+            try:
+                session = ChatSession.objects.get(id=session_id)
+            except ChatSession.DoesNotExist:
+                # Fallback to new session if not found
+                session = ChatSession.objects.create(title=question[:50])
+        else:
+            session = ChatSession.objects.create(title=question[:50])
+            
+        # 1. Save User Message
+        ChatMessage.objects.create(session=session, role='user', content=question)
+        
+        # 2. Get Chat History (Last 5 messages for context)
+        history = ChatMessage.objects.filter(session=session).order_by('created_at')[:10] # Get last 10 messages
+        history_text = ""
+        for msg in history:
+            history_text += f"{msg.role}: {msg.content}\n"
+        
+        # 3. Get Financial Data Context
+        data_context = self._extract_data_context(question)
         context_text = self._format_context(data_context)
         
-        # Generate response using AI
-        # Combined prompt with App Documentation and User Data
-        prompt = f'''Question: {question}
+        # 4. Generate response using AI
+        prompt = f'''History of current conversation:
+{history_text}
+
+Question: {question}
 
 --- SYSTEM DOCUMENTATION (Features & Tech Stack) ---
 {APP_FEATURES}
@@ -57,9 +79,15 @@ Data provided will be in JSON format. Use it to answer the user's question accur
 
 Answer:'''
         
-        response = ai_service.generate_text(prompt, self.SYSTEM_PROMPT)
+        response_text = ai_service.generate_text(prompt, self.SYSTEM_PROMPT)
         
-        return response
+        # 5. Save Assistant Message
+        ChatMessage.objects.create(session=session, role='assistant', content=response_text)
+        
+        return {
+            "answer": response_text,
+            "session_id": session.id
+        }
     
     def _extract_data_context(self, question: str) -> Dict[str, Any]:
         """
@@ -77,7 +105,35 @@ Answer:'''
         current_month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         
         # Check for time references
-        if "tháng này" in question_lower or "tháng hiện tại" in question_lower:
+        # Check for specific date patterns using Regex
+        import re
+        # Pattern: ngày dd/mm/yyyy or dd/mm
+        date_pattern = r'ngày (\d{1,2})[/-](\d{1,2})(?:[/-](\d{4}))?'
+        match = re.search(date_pattern, question_lower)
+        
+        if match:
+            day = int(match.group(1))
+            month = int(match.group(2))
+            year = int(match.group(3)) if match.group(3) else now.year
+            
+            try:
+                # Set range to that specific full day (00:00:00 to 23:59:59)
+                start_date = datetime(year, month, day, 0, 0, 0)
+                end_date = datetime(year, month, day, 23, 59, 59)
+            except ValueError:
+                # Fallback if invalid date
+                start_date = current_month_start
+                end_date = now
+        
+        # Check for relative time references if no specific date matched
+        elif "hôm nay" in question_lower:
+            start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
+            end_date = now
+        elif "hôm qua" in question_lower:
+            yesterday = now - timedelta(days=1)
+            start_date = yesterday.replace(hour=0, minute=0, second=0, microsecond=0)
+            end_date = yesterday.replace(hour=23, minute=59, second=59, microsecond=999999)
+        elif "tháng này" in question_lower or "tháng hiện tại" in question_lower:
             start_date = current_month_start
             end_date = now
         elif "tháng trước" in question_lower:
@@ -108,14 +164,21 @@ Answer:'''
         total_expense = transactions.filter(transaction_type='expense').aggregate(Sum('amount'))['amount__sum'] or 0
         transaction_count = transactions.count()
         
+        # Calculate Real Wallet Balance (Total Assets)
+        from ..models import Wallet
+        wallets = Wallet.objects.all()
+        real_wallet_balance = sum(w.balance for w in wallets)
+        
         context['period'] = {
             'start': start_date.isoformat(),
             'end': end_date.isoformat(),
+            'note': 'This data is for the specific period derived from the question (default: current month). For "Current Balance", use real_wallet_balance.'
         }
         context['totals'] = {
-            'income': float(total_income),
-            'expense': float(total_expense),
-            'balance': float(total_income - total_expense),
+            'period_income': float(total_income),
+            'period_expense': float(total_expense),
+            'period_balance': float(total_income - total_expense),
+            'real_wallet_balance': float(real_wallet_balance), # This is the true "Current Balance"
             'count': transaction_count,
         }
         
@@ -147,13 +210,23 @@ Answer:'''
                 total=Sum('amount')
             ).order_by('-total')[:5]
             
-            context['categories'] = [
-                {
-                    'name': item['category__name'],
-                    'amount': float(item['total'])
-                }
                 for item in category_breakdown
             ]
+
+        # Add List of Transactions (Limit 10 newest) for specific queries
+        # This helps AI answer "List my transactions" or "What did I buy?"
+        recent_tx = transactions.select_related('category', 'wallet').order_by('-date')[:15]
+        context['transactions_list'] = [
+            {
+                "date": tx.date.strftime("%Y-%m-%d %H:%M"),
+                "desc": tx.description,
+                "amount": float(tx.amount),
+                "type": tx.transaction_type,
+                "category": tx.category.name if tx.category else "Uncategorized",
+                "wallet": tx.wallet.name
+            }
+            for tx in recent_tx
+        ]
         
         return context
     
