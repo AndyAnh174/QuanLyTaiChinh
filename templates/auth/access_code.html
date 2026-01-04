@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Nhập Mã Truy Cập - AI Smart Finance{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center align-items-center" style="min-height: 80vh;">
+        <div class="col-md-5">
+            <div class="card border-0 shadow-lg">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="bi bi-shield-lock text-primary" style="font-size: 2.5rem;"></i>
+                        </div>
+                        <h2 class="fw-bold">Nhập Mã Truy Cập</h2>
+                        <p class="text-muted">Vui lòng nhập mã truy cập để tiếp tục</p>
+                    </div>
+                    
+                    <form id="accessCodeForm">
+                        <div class="mb-3">
+                            <label for="accessCode" class="form-label">Mã truy cập</label>
+                            <input 
+                                type="password" 
+                                class="form-control form-control-lg" 
+                                id="accessCode" 
+                                name="code" 
+                                placeholder="Nhập mã truy cập"
+                                required
+                                autofocus
+                            >
+                        </div>
+                        
+                        <div id="errorMessage" class="alert alert-danger" style="display: none;" role="alert"></div>
+                        <div id="successMessage" class="alert alert-success" style="display: none;" role="alert"></div>
+                        
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            <i class="bi bi-check-circle"></i> Xác nhận
+                        </button>
+                    </form>
+                    
+                    <p class="text-center text-muted small mt-4 mb-0">
+                        <i class="bi bi-info-circle"></i> Mã truy cập mặc định có thể được cấu hình trong cài đặt hệ thống
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static 'js/auth.js' %}"></script>
+{% endblock %}
+

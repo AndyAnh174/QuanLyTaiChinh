@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Ngân sách - AI Smart Finance{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">
+            <i class="bi bi-piggy-bank"></i> Ngân sách
+        </h1>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBudgetModal">
+            <i class="bi bi-plus-circle"></i> Thêm ngân sách
+        </button>
+    </div>
+    
+    <div id="budgetsContainer" class="row g-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Đang tải...</span>
+                        </div>
+                        <p class="mt-3 text-muted">Đang tải danh sách ngân sách...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Budget Modal -->
+<div class="modal fade" id="addBudgetModal" tabindex="-1" aria-labelledby="addBudgetModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addBudgetModalLabel">
+                    <i class="bi bi-plus-circle"></i> Thêm Ngân sách Mới
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="addBudgetForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="budgetCategory" class="form-label fw-bold">Danh mục <span class="text-danger">*</span></label>
+                        <select class="form-select" id="budgetCategory" required>
+                            <option value="">-- Chọn danh mục --</option>
+                        </select>
+                        <div class="form-text">Chọn danh mục chi tiêu bạn muốn đặt ngân sách</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="budgetAmount" class="form-label fw-bold">Số tiền (₫) <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="budgetAmount" min="0" step="1000" required placeholder="Ví dụ: 5000000">
+                        <div class="form-text">Nhập số tiền tối đa cho ngân sách này</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="budgetPeriod" class="form-label fw-bold">Chu kỳ <span class="text-danger">*</span></label>
+                        <select class="form-select" id="budgetPeriod" required>
+                            <option value="monthly">Hàng tháng</option>
+                            <option value="weekly">Hàng tuần</option>
+                            <option value="yearly">Hàng năm</option>
+                        </select>
+                        <div class="form-text">Chọn chu kỳ áp dụng ngân sách</div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="budgetStartDate" class="form-label fw-bold">Ngày bắt đầu <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="budgetStartDate" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="budgetEndDate" class="form-label fw-bold">Ngày kết thúc <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="budgetEndDate" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle"></i> Tạo Ngân sách
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static 'js/budgets.js' %}"></script>
+{% endblock %}

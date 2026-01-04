@@ -1,0 +1,63 @@
+# Django Core
+Django>=5.0,<6.0
+django-ninja>=1.0.0
+asgiref==3.11.0
+sqlparse==0.5.4
+
+# Database
+psycopg2-binary==2.9.9  # PostgreSQL adapter
+
+# Vector Database
+qdrant-client==1.7.0  # Qdrant Python client
+
+# Redis & Caching
+redis==5.0.1
+django-redis>=5.4.0  # Note: Cần cài thêm nếu chưa có
+
+# Task Queue
+celery==5.3.4
+kombu==5.5.4
+billiard==4.2.2
+vine==5.1.0
+amqp==5.3.1
+django-celery-beat>=2.5.0  # Periodic tasks scheduler (cần cài thêm)
+
+# AI Services
+google-genai>=0.2.0  # Gemini 3 Flash API (new package)
+google-generativeai==0.3.1  # Legacy (deprecated, keep for compatibility)
+google-api-core==2.26.0
+google-auth==2.41.1
+googleapis-common-protos==1.70.0
+google-ai-generativelanguage==0.4.0
+ollama==0.1.7
+
+# Image Processing & OCR
+Pillow==11.3.0  # Image processing
+requests==2.32.3  # HTTP requests
+
+# Utilities
+python-dotenv==1.0.0  # Environment variables
+python-dateutil==2.8.2  # Date utilities
+pytz==2023.3
+
+# Security & Authentication
+bcrypt==4.0.1
+argon2-cffi==25.1.0
+argon2-cffi-bindings==25.1.0
+passlib==1.7.4
+
+# Testing
+playwright>=1.57.0  # Browser automation for UI testing
+pytest-playwright>=0.7.0  # Playwright plugin for pytest
+pytest-django>=4.8.0  # Django plugin for pytest
+
+# Development (Optional)
+django-debug-toolbar>=4.2.0  # Debug toolbar (optional)
+
+# Note: Các packages sau đây có trong pip freeze nhưng có thể không cần thiết cho project:
+# - langchain, langchain-* (nếu không dùng LangChain)
+# - torch, torchvision (nếu không dùng PyTorch)
+# - streamlit (nếu không dùng Streamlit)
+# - fastapi (nếu chỉ dùng Django Ninja)
+# 
+# Để cài đặt: pip install -r requirements.txt

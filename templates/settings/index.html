@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Cài đặt - AI Smart Finance{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h1 class="mb-4">
+        <i class="bi bi-gear"></i> Cài đặt
+    </h1>
+    
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 pt-4">
+                    <h5 class="mb-0">Cài đặt hệ thống</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Change Access Code -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Mã truy cập</label>
+                        <p class="text-muted small">Thay đổi mã truy cập để bảo vệ ứng dụng của bạn</p>
+                        <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#changeAccessCodeModal">
+                            <i class="bi bi-key"></i> Đổi mã truy cập
+                        </button>
+                    </div>
+                    <hr>
+                    
+                    <!-- Export Data -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Xuất dữ liệu</label>
+                        <p class="text-muted small">Tải xuống tất cả dữ liệu giao dịch của bạn dưới dạng CSV</p>
+                        <button class="btn btn-outline-success" onclick="exportData()">
+                            <i class="bi bi-download"></i> Xuất CSV
+                        </button>
+                    </div>
+                    <hr>
+                    
+                    <!-- Delete Data -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Xóa dữ liệu</label>
+                        <p class="text-muted small text-danger">
+                            <i class="bi bi-exclamation-triangle"></i> 
+                            <strong>Cảnh báo:</strong> Hành động này không thể hoàn tác. Tất cả giao dịch, ngân sách và dữ liệu sẽ bị xóa vĩnh viễn.
+                        </p>
+                        <button class="btn btn-outline-danger" onclick="confirmDeleteData()">
+                            <i class="bi bi-trash"></i> Xóa tất cả dữ liệu
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 pt-4">
+                    <h5 class="mb-0">Thông tin</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2"><strong>Phiên bản:</strong> 1.0.0</p>
+                    <p class="mb-2"><strong>Framework:</strong> Django 5.2</p>
+                    <p class="mb-0"><strong>AI Engine:</strong> Gemini 3 Flash</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Change Access Code Modal -->
+<div class="modal fade" id="changeAccessCodeModal" tabindex="-1" aria-labelledby="changeAccessCodeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="changeAccessCodeModalLabel">
+                    <i class="bi bi-key"></i> Đổi Mã Truy Cập
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="changeAccessCodeForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="oldAccessCode" class="form-label fw-bold">Mã truy cập hiện tại <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control" id="oldAccessCode" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newAccessCode" class="form-label fw-bold">Mã truy cập mới <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control" id="newAccessCode" minlength="4" required>
+                        <div class="form-text">Mã truy cập mới phải có ít nhất 4 ký tự</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirmAccessCode" class="form-label fw-bold">Xác nhận mã mới <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control" id="confirmAccessCode" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle"></i> Đổi Mã
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static 'js/settings.js' %}"></script>
+{% endblock %}

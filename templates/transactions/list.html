@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Giao dịch - AI Smart Finance{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">
+            <i class="bi bi-receipt"></i> Quản lý Giao dịch
+        </h1>
+        <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#addTransactionModal">
+            <i class="bi bi-plus-lg"></i> Thêm Giao dịch
+        </button>
+    </div>
+    
+    <!-- Tabs Navigation -->
+    <ul class="nav nav-tabs mb-4" id="transactionTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="quick-add-tab" data-bs-toggle="tab" data-bs-target="#quick-add" type="button" role="tab">
+                <i class="bi bi-chat-text"></i> Quick Add by Text
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="upload-tab" data-bs-toggle="tab" data-bs-target="#upload" type="button" role="tab">
+                <i class="bi bi-camera"></i> Upload Hóa đơn (OCR)
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="list-tab" data-bs-toggle="tab" data-bs-target="#list" type="button" role="tab">
+                <i class="bi bi-list-ul"></i> Danh sách Giao dịch
+            </button>
+        </li>
+    </ul>
+    
+    <!-- Tab Content -->
+    <div class="tab-content" id="transactionTabsContent">
+        <!-- Tab 1: Quick Add by Text -->
+        <div class="tab-pane fade show active" id="quick-add" role="tabpanel" aria-labelledby="quick-add-tab">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 pt-4">
+                    <h5 class="mb-2">
+                        <i class="bi bi-chat-text text-primary"></i> Quick Add by Text
+                    </h5>
+                    <p class="text-muted small mb-0">
+                        <i class="bi bi-info-circle"></i> 
+                        <strong>Chức năng:</strong> Nhập giao dịch bằng văn bản tự nhiên. AI sẽ tự động phân tích và tạo giao dịch.
+                        Hỗ trợ nhiều giao dịch trong một lần nhập. Ví dụ: "Sáng ăn phở 45k, chiều mua cà phê 30k"
+                    </p>
+                </div>
+                <div class="card-body">
+                    <form id="quickAddForm">
+                        <div class="mb-3">
+                            <label for="quickAddText" class="form-label fw-bold">Nhập mô tả giao dịch:</label>
+                            <textarea 
+                                class="form-control" 
+                                id="quickAddText" 
+                                rows="5"
+                                placeholder="Ví dụ: Sáng nay ăn phở 45k tiền mặt, rồi ghé Circle K mua nước 10k quẹt Momo, tối đi xem phim 150k bằng thẻ"
+                            ></textarea>
+                            <div class="form-text">
+                                <i class="bi bi-lightbulb"></i> 
+                                <strong>Mẹo:</strong> Bạn có thể nhập nhiều giao dịch cùng lúc, mỗi giao dịch cách nhau bằng dấu phẩy hoặc xuống dòng.
+                                AI sẽ tự động nhận diện số tiền, phương thức thanh toán, và gợi ý danh mục.
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-magic"></i> Phân tích và Tạo Giao dịch
+                        </button>
+                    </form>
+                    
+                    <div id="quickAddResults" class="mt-4" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab 2: Upload Receipt (OCR) -->
+        <div class="tab-pane fade" id="upload" role="tabpanel" aria-labelledby="upload-tab">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 pt-4">
+                    <h5 class="mb-2">
+                        <i class="bi bi-camera text-success"></i> Upload Hóa đơn (OCR)
+                    </h5>
+                    <p class="text-muted small mb-0">
+                        <i class="bi bi-info-circle"></i> 
+                        <strong>Chức năng:</strong> Chụp hoặc upload ảnh hóa đơn/biên lai. AI sẽ tự động đọc thông tin (tên cửa hàng, số tiền, ngày tháng) 
+                        và tạo giao dịch tự động. Hỗ trợ ảnh từ camera hoặc file trên máy.
+                    </p>
+                </div>
+                <div class="card-body">
+                    <form id="uploadReceiptForm" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="receiptFile" class="form-label fw-bold">Chọn ảnh hóa đơn:</label>
+                            <input 
+                                type="file" 
+                                class="form-control form-control-lg" 
+                                id="receiptFile" 
+                                accept="image/*" 
+                                capture="environment"
+                            >
+                            <div class="form-text">
+                                <i class="bi bi-lightbulb"></i> 
+                                <strong>Mẹo:</strong> Chụp ảnh rõ nét, đảm bảo hóa đơn nằm trong khung hình. 
+                                Hỗ trợ định dạng: JPG, PNG, WebP. Kích thước tối đa: 10MB.
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="bi bi-upload"></i> Upload và Phân tích
+                        </button>
+                    </form>
+                    
+                    <div id="uploadPreview" class="mt-3 text-center" style="display: none;">
+                        <img id="previewImage" src="" alt="Preview" class="img-thumbnail" style="max-height: 300px;">
+                    </div>
+                    
+                    <div id="uploadResults" class="mt-4" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab 3: Transaction List -->
+        <div class="tab-pane fade" id="list" role="tabpanel" aria-labelledby="list-tab">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 pt-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-2">
+                                <i class="bi bi-list-ul text-info"></i> Danh sách Giao dịch
+                            </h5>
+                            <p class="text-muted small mb-0">
+                                <i class="bi bi-info-circle"></i> 
+                                <strong>Chức năng:</strong> Xem tất cả giao dịch đã tạo. Có thể lọc, tìm kiếm, và chỉnh sửa giao dịch.
+                                Hiển thị 50 giao dịch gần nhất theo mặc định.
+                            </p>
+                        </div>
+                        <div>
+                            <button class="btn btn-outline-primary btn-sm" onclick="loadTransactions()">
+                                <i class="bi bi-arrow-clockwise"></i> Làm mới
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="transactionsContainer">
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Đang tải...</span>
+                            </div>
+                            <p class="mt-3 text-muted">Đang tải danh sách giao dịch...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+
+<!-- Add Transaction Modal -->
+<div class="modal fade" id="addTransactionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Thêm Giao dịch Mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addTransactionForm">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Loại giao dịch</label>
+                        <div class="d-flex gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="transaction_type" id="typeExpense" value="expense" checked>
+                                <label class="form-check-label text-danger" for="typeExpense">
+                                    <i class="bi bi-arrow-down-circle"></i> Chi tiêu
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="transaction_type" id="typeIncome" value="income">
+                                <label class="form-check-label text-success" for="typeIncome">
+                                    <i class="bi bi-arrow-up-circle"></i> Thu nhập
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="transAmount" class="form-label">Số tiền (*)</label>
+                        <input type="number" class="form-control form-control-lg" id="transAmount" required min="0" placeholder="Ví dụ: 50000">
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="transWallet" class="form-label">Ví thanh toán (*)</label>
+                            <select class="form-select" id="transWallet" required>
+                                <option value="">-- Chọn ví --</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="transCategory" class="form-label">Danh mục (*)</label>
+                            <select class="form-select" id="transCategory" required>
+                                <option value="">-- Chọn danh mục --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="transDate" class="form-label">Ngày giao dịch</label>
+                        <input type="date" class="form-control" id="transDate" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="transDesc" class="form-label">Mô tả</label>
+                        <textarea class="form-control" id="transDesc" rows="2" placeholder="Chi tiết giao dịch..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="submitTransaction()">
+                    <i class="bi bi-check-lg"></i> Lưu Giao dịch
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static 'js/transactions.js' %}"></script>
+{% endblock %}
