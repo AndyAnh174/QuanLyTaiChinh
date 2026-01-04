@@ -1,170 +1,502 @@
-/* Base Styles */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+/* 
+   Neo-Brutalism / Education Theme 
+   Inspired by LearnHub style
+*/
+
+:root {
+  /* Color Palette */
+  --bg-color: #fffbf0; /* Vintage Cream/Beige */
+  --primary-color: #00c665; /* Bright Green from image */
+  --secondary-color: #ff9f29; /* Pop Orange */
+  --accent-blue: #3ab4f2; /* Sky Blue */
+  --accent-purple: #a555ec; /* Pop Purple */
+  --text-color: #1f1f1f; /* Almost Black */
+  --border-color: #000000; /* Pure Black borders */
+
+  /* Layout Tokens */
+  --border-width: 2px;
+  --border-radius: 12px;
+  --shadow-offset: 4px;
+
+  /* Box Shadow - The Signature Look */
+  --hard-shadow: var(--shadow-offset) var(--shadow-offset) 0px
+    var(--border-color);
+  --hard-shadow-hover: 2px 2px 0px var(--border-color);
+  --hard-shadow-sm: 2px 2px 0px var(--border-color);
 }
 
+/* Base Reset & Typography */
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    line-height: 1.6;
-    color: #333;
-    background-color: #f5f5f5;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: "Outfit", "Segoe UI", Roboto, Helvetica, Arial, sans-serif; /* Rounder font if available */
+  line-height: 1.6;
 }
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 800;
+  color: var(--text-color);
+  letter-spacing: -0.02em;
 }
 
-/* Navigation */
+/* Navbar Styling - Floating Pill Style */
 .navbar {
-    background-color: #4F46E5;
-    color: white;
-    padding: 1rem 0;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  background-color: #fff !important;
+  border: var(--border-width) solid var(--border-color);
+  border-radius: 50px; /* Pill shape */
+  box-shadow: var(--hard-shadow);
+  margin: 1rem 1rem 2rem 1rem; /* Detached from top */
+  padding: 0.8rem 1.5rem;
+  transition: transform 0.2s;
 }
 
-.navbar .container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.navbar-brand {
+  color: var(--text-color) !important;
+  font-weight: 900;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.logo {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: white;
-    text-decoration: none;
+.navbar-brand i {
+  color: var(--primary-color); /* Icon specific color */
+  filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 1)); /* Hard shadow on icon */
 }
 
-.nav-links {
-    display: flex;
-    gap: 2rem;
+/* Nav links */
+.nav-link {
+  color: var(--text-color) !important;
+  font-weight: 600;
+  padding: 0.5rem 1rem !important;
+  border-radius: 20px;
+  transition: all 0.2s;
 }
 
-.nav-links a {
-    color: white;
-    text-decoration: none;
-    transition: opacity 0.2s;
+.nav-link:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  transform: translateY(-1px);
 }
 
-.nav-links a:hover {
-    opacity: 0.8;
+.nav-link.active {
+  background-color: var(--text-color);
+  color: #fff !important;
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.2);
 }
 
-/* Main Content */
-.main-content {
-    min-height: calc(100vh - 200px);
-    padding: 2rem 0;
-}
-
-/* Access Code Page */
-.access-code-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 80vh;
-}
-
-.access-code-box {
-    background: white;
-    padding: 3rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    max-width: 400px;
-    width: 100%;
-}
-
-.access-code-box h1 {
-    margin-bottom: 0.5rem;
-    text-align: center;
-}
-
-.subtitle {
-    text-align: center;
-    color: #666;
-    margin-bottom: 2rem;
-}
-
-.form-group {
-    margin-bottom: 1rem;
-}
-
-.form-group input {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1rem;
-}
-
-.form-group input:focus {
-    outline: none;
-    border-color: #4F46E5;
-}
-
+/* Buttons - The Core of Neo-Brutalism */
 .btn {
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 4px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.2s;
+  border: var(--border-width) solid var(--border-color);
+  box-shadow: var(--hard-shadow);
+  font-weight: 700;
+  border-radius: var(--border-radius);
+  padding: 0.6rem 1.5rem;
+  transition: all 0.15s ease;
+  text-transform: capitalize;
 }
 
+.btn:hover {
+  transform: translate(1px, 1px);
+  box-shadow: var(--hard-shadow-hover);
+}
+
+.btn:active {
+  transform: translate(var(--shadow-offset), var(--shadow-offset));
+  box-shadow: none;
+}
+
+/* Primary Button (Green) */
 .btn-primary {
-    background-color: #4F46E5;
-    color: white;
-    width: 100%;
+  background-color: var(--primary-color);
+  color: var(--text-color);
 }
 
-.btn-primary:hover {
-    background-color: #4338CA;
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: #00b359;
+  color: var(--text-color);
+  border-color: var(--border-color);
 }
 
-.error-message {
-    color: #DC2626;
-    padding: 0.5rem;
-    margin-bottom: 1rem;
-    background-color: #FEE2E2;
-    border-radius: 4px;
+/* Semantic Colors reused */
+.btn-success {
+  background-color: var(--primary-color);
+  color: var(--text-color);
+}
+.btn-info {
+  background-color: var(--accent-blue);
+  color: var(--text-color);
+}
+.btn-warning {
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+}
+.btn-danger {
+  background-color: #ff5d5d;
+  color: var(--text-color);
 }
 
-.success-message {
-    color: #059669;
-    padding: 0.5rem;
-    margin-bottom: 1rem;
-    background-color: #D1FAE5;
-    border-radius: 4px;
+/* Cards & Containers */
+.card,
+.access-code-box,
+.chat-container,
+.modal-content {
+  border: var(--border-width) solid var(--border-color);
+  box-shadow: var(--hard-shadow);
+  border-radius: var(--border-radius);
+  background-color: #fff;
+  overflow: hidden; /* Keep children inside border radius */
 }
 
-.help-text {
-    text-align: center;
-    margin-top: 1rem;
-    color: #666;
+.card-header {
+  background-color: #fff;
+  border-bottom: var(--border-width) solid var(--border-color);
+  font-weight: bold;
+  padding: 1rem 1.5rem;
 }
 
-/* Footer */
+/* Form Inputs */
+.form-control,
+.form-select {
+  border: var(--border-width) solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: var(--hard-shadow-sm);
+  padding: 0.75rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--border-color);
+  box-shadow: var(--hard-shadow); /* Bigger shadow on focus */
+  transform: translateY(-1px);
+  outline: none;
+}
+
+/* Floating Badges/Tags */
+.badge {
+  border: 1px solid var(--border-color);
+  box-shadow: 1px 1px 0px var(--border-color);
+  color: var(--text-color) !important;
+  font-weight: 600;
+}
+
+.badge.bg-success {
+  background-color: var(--primary-color) !important;
+}
+.badge.bg-primary {
+  background-color: var(--accent-blue) !important;
+}
+.badge.bg-warning {
+  background-color: var(--secondary-color) !important;
+}
+.badge.bg-danger {
+  background-color: #ff5d5d !important;
+}
+
+/* Custom Chat Interface Overrides (matching the new theme) */
+.chat-container {
+  background-color: #fff;
+}
+
+.message.user .message-content {
+  background-color: var(--accent-blue) !important;
+  color: var(--text-color) !important;
+  border: var(--border-width) solid var(--border-color);
+  box-shadow: 2px 2px 0px var(--border-color);
+}
+
+.message.ai .message-content {
+  background-color: #f3f4f6 !important;
+  border: var(--border-width) solid var(--border-color);
+  color: var(--text-color) !important;
+}
+
+.chat-input-area {
+  border-top: var(--border-width) solid var(--border-color);
+}
+
+/* Footer styling */
 .footer {
-    background-color: #1F2937;
-    color: white;
-    padding: 2rem 0;
-    text-align: center;
-    margin-top: 4rem;
+  border-top: var(--border-width) solid var(--border-color);
+  background-color: var(
+    --text-color
+  ); /* Keep dark for contrast, or switch to white */
 }
 
-/* Responsive */
+/* Responsive & UI Fixes */
+
+/* Navbar Toggler Fix */
+.navbar-toggler {
+    border: 2px solid var(--text-color);
+    box-shadow: 2px 2px 0px var(--text-color);
+    padding: 0.5rem;
+    border-radius: 8px;
+    color: var(--text-color) !important;
+}
+
+.navbar-collapse {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+@media (min-width: 992px) {
+    .navbar-collapse {
+        background-color: transparent;
+        border: none;
+        padding: 0;
+        margin-top: 0;
+    }
+}
+
+/* Card & Input Adjustments */
+.card {
+    margin-bottom: 2rem; /* More spacing between cards */
+}
+
+.input-group-custom, .form-control, .form-select {
+    background-color: #fff !important; /* Ensure white background */
+    color: var(--text-color) !important;
+}
+
+textarea.form-control {
+    border-radius: 12px !important;
+    min-height: 120px;
+}
+
+/* Navigation Tabs */
+.nav-tabs {
+    border-bottom: 2px solid var(--border-color);
+    gap: 0.5rem;
+}
+
+.nav-tabs .nav-link {
+    border: 2px solid transparent;
+    color: var(--text-color);
+    border-radius: 12px 12px 0 0;
+    font-weight: 600;
+    margin-bottom: -2px; /* Overlap border */
+}
+
+.nav-tabs .nav-link:hover {
+    border-color: transparent;
+    background-color: rgba(0,0,0,0.05); 
+}
+
+.nav-tabs .nav-link.active {
+    background-color: #fff;
+    border-color: var(--border-color);
+    border-bottom-color: #fff;
+    color: var(--primary-color) !important;
+    box-shadow: none; /* Flat look for active tab connection */
+}
+
+/* Footer Fixes */
+.footer {
+    padding: 1rem;
+    background-color: var(--text-color);
+    color: #fff !important;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* Ensure on top */
+}
+
+/* Add padding to body so content isn't hidden behind fixed footer */
+body {
+    padding-bottom: 100px; /* Adjust based on footer height */
+}
+
+.footer a {
+    color: #ccc;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.footer a:hover {
+    color: #fff;
+    text-decoration: underline;
+}
+
+/* Dashboard Summary Card Icons */
+.rounded-circle.p-3 {
+    border: 2px solid var(--border-color);
+    box-shadow: 2px 2px 0px var(--border-color);
+}
+
+/* Quick Add Input specific fix */
+#quickAddText {
+    border: 2px solid var(--border-color) !important;
+    box-shadow: inset 2px 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Mobile Responsiveness */
 @media (max-width: 768px) {
-    .nav-links {
+    .navbar {
+        margin: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+    }
+    
+    .container {
+        padding: 0 16px;
+    }
+    
+    .card {
+        padding: 1rem;
+    }
+    
+    h1 {
+        font-size: 1.75rem;
+    }
+    
+    .btn-lg {
+        width: 100%; /* Full width buttons on mobile */
+        margin-bottom: 0.5rem;
+    }
+    
+    .d-flex.justify-content-between {
         flex-direction: column;
+        align-items: flex-start !important;
         gap: 1rem;
     }
     
-    .access-code-box {
-        padding: 2rem;
-        margin: 1rem;
+    /* Fix row issues in transaction list */
+    .nav-tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding-bottom: 2px; /* Allow space for scrollbar */
+        white-space: nowrap;
+        border-bottom: 2px solid var(--border-color);
+        -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
+        scrollbar-width: none; /* Hide scrollbar Firefox */
+    }
+    
+    .nav-tabs::-webkit-scrollbar {
+        display: none; /* Hide scrollbar Chrome/Safari */
+    }
+    
+    .nav-tabs .nav-link {
+        white-space: nowrap;
+        flex: 0 0 auto;
+    }
+
+    /* Action Buttons in Table */
+    .table-actions {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: flex-end;
+    }
+
+    .table-actions .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    /* Hide less important columns on mobile */
+    .mobile-hide {
+        display: none;
+    }
+    
+    /* Better table spacing on mobile */
+    /* Transform Table to Cards for Mobile */
+    .table thead {
+        display: none;
+    }
+
+    .table tbody, .table tr, .table td {
+        display: block;
+        width: 100%;
+    }
+
+    .table tr {
+        background: #fff;
+        margin-bottom: 1rem;
+        border: 2px solid var(--border-color);
+        border-radius: 12px;
+        box-shadow: 4px 4px 0px var(--border-color); /* Matches theme */
+        padding: 1rem;
+    }
+
+    .table td {
+        padding: 0.25rem 0;
+        border: none;
+        text-align: left;
+        position: relative;
+    }
+
+    /* Specific cell styling for card layout */
+    
+    /* Description: Big and Bold */
+    .table td:nth-child(2) { 
+        font-weight: 900;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Date */
+    .table td:nth-child(1) {
+        color: #666;
+        font-size: 0.85rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    /* Category & Wallet: Inline-ish */
+    .table td:nth-child(3), .table td:nth-child(4) {
+        display: inline-block;
+        width: auto;
+        margin-right: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    /* Amount: Highlighted */
+    .table td:nth-child(5) {
+        font-size: 1.2rem;
+        font-weight: bold;
+        text-align: right;
+        margin-top: 0.5rem;
+        border-top: 1px dashed #ddd; /* Separator */
+        padding-top: 0.5rem;
+    }
+
+    /* Actions */
+    .table td:last-child {
+        text-align: right;
+        margin-top: 0.5rem;
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.5rem;
+    }
+    
+    /* Hide empty border from bootstrap */
+    .table > :not(caption) > * > * {
+        border-bottom-width: 0;
     }
 }
 
+/* Utility Animations */
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.float-animation {
+  animation: float 3s ease-in-out infinite;
+}
