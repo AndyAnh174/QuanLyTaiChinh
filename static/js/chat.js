@@ -1,13 +1,15 @@
 // Chat AI Logic
 
+// Track Session ID (Global Scope)
+let currentSessionId = localStorage.getItem('chat_session_id') ? parseInt(localStorage.getItem('chat_session_id')) : null;
+
 document.addEventListener('DOMContentLoaded', () => {
     const chatForm = document.getElementById('chatForm');
     const userInput = document.getElementById('userInput');
     const chatMessages = document.getElementById('chatMessages');
     const typingIndicator = document.getElementById('typingIndicator');
     
-    // Track Session ID
-    let currentSessionId = localStorage.getItem('chat_session_id') ? parseInt(localStorage.getItem('chat_session_id')) : null;
+    // Auto focus input
     
     // Auto focus input
     userInput.focus();
