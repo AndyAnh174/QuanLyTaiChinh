@@ -61,3 +61,34 @@ def get_history(request, session_id: int):
         ]
     except ChatSession.DoesNotExist:
         return []
+
+
+@router.get("/sessions", response=List[Dict], summary="List all chat sessions")
+def list_sessions(request):
+    """List all chat sessions for sidebar history"""
+    from ..models import ChatSession
+    
+    sessions = ChatSession.objects.all().order_by('-updated_at')
+    
+    return [
+        {
+            "id": s.id,
+            "title": s.title,
+            "created_at": s.created_at.isoformat(),
+            "updated_at": s.updated_at.isoformat()
+        }
+        for s in sessions
+    ]
+
+
+@router.delete("/sessions/{session_id}", summary="Delete a chat session")
+def delete_session(request, session_id: int):
+    """Delete a specific chat session"""
+    from ..models import ChatSession
+    
+    try:
+        session = ChatSession.objects.get(id=session_id)
+        session.delete()
+        return {"success": True}
+    except ChatSession.DoesNotExist:
+        return {"success": False, "error": "Session not found"}

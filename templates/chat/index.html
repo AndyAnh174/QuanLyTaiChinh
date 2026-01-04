@@ -325,26 +325,31 @@
 <div class="chat-layout">
     <!-- Sidebar: Info & History (Desktop Only) -->
     <div class="chat-sidebar d-none d-lg-flex">
-        <div class="mb-4">
+        <div class="mb-3">
             <h5 class="fw-bold mb-3"><i class="bi bi-robot text-primary me-2"></i>Trợ lý Tài chính</h5>
-            <p class="text-muted small">Sử dụng AI để phân tích dữ liệu tài chính của bạn và đưa ra lời khuyên hữu ích.</p>
         </div>
         
-        <div class="stat-card">
+        <button class="btn btn-primary w-100 mb-3" onclick="startNewChat()">
+            <i class="bi bi-plus-lg me-2"></i> Cuộc trò chuyện mới
+        </button>
+        
+        <div class="stat-card mb-3">
             <div class="stat-label">Số dư hiện tại</div>
             <div class="stat-value text-primary" id="sidebarBalance">...</div>
         </div>
         
-        <div class="mt-auto">
-            <small class="text-muted d-block mb-2">Gợi ý:</small>
-            <div class="d-flex flex-column gap-2">
-                <button class="btn btn-sm btn-light text-start" onclick="sendSuggestion('Phân tích chi tiêu tháng này')">
-                    <i class="bi bi-pie-chart me-2"></i>Phân tích chi tiêu
-                </button>
-                <button class="btn btn-sm btn-light text-start" onclick="sendSuggestion('Cảnh báo ngân sách')">
-                    <i class="bi bi-exclamation-triangle me-2"></i>Cảnh báo ngân sách
-                </button>
-            </div>
+        <h6 class="text-muted small fw-bold text-uppercase mt-2 mb-2">Lịch sử chat</h6>
+        <div class="flex-grow-1 overflow-auto" id="sessionList" style="max-height: 400px;">
+            <!-- Sessions will be loaded here -->
+            <div class="text-center text-muted small py-3">Đang tải...</div>
+        </div>
+        
+        <!-- Suggestions (Keep handy) -->
+        <div class="mt-3 border-top pt-3">
+             <small class="text-muted d-block mb-2">Gợi ý nhanh:</small>
+             <button class="btn btn-sm btn-light w-100 text-start mb-1" onclick="sendSuggestion('Phân tích chi tiêu')">
+                <i class="bi bi-pie-chart me-2"></i>Phân tích chi tiêu
+             </button>
         </div>
     </div>
 
@@ -413,7 +418,7 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script src="{% static 'js/chat.js' %}?v={{ now|date:'U'|add:'1' }}"></script>
+<script src="{% static 'js/chat.js' %}?v={{ now|date:'U'|add:'2' }}"></script>
 <script>
     // Quick inline script to load balance for sidebar
     document.addEventListener('DOMContentLoaded', async () => {

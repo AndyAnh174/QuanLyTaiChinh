@@ -20,7 +20,7 @@ from django.views.generic import TemplateView
 from django.conf import settings
 from django.conf.urls.static import static
 from ninja import NinjaAPI
-from app.api import auth, wallets, categories, transactions, search, budgets, recurring, debts, dashboard, chat
+from app.api import auth, wallets, categories, transactions, search, budgets, recurring, debts, dashboard, chat, settings as settings_api
 
 api = NinjaAPI(
     title="AI Smart Finance API",
@@ -39,6 +39,7 @@ api.add_router("/recurring", recurring.router, tags=["recurring"])
 api.add_router("/debts", debts.router, tags=["debts"])
 api.add_router("/dashboard", dashboard.router, tags=["dashboard"])
 api.add_router("/chat", chat.router, tags=["chat"])
+api.add_router("/settings", settings_api.router, tags=["settings"])
 
 @api.get("/hello")
 def hello(request):

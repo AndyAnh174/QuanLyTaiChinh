@@ -143,45 +143,27 @@ async function executeDeleteData() {
     try {
         showAlert('Đang xóa dữ liệu...', 'warning');
         
-        // Get all transactions and delete them (Backend integration)
-        // Note: Ideally backend should have a "reset" endpoint, but we loop delete here as per existing logic
-        const transactions = await window.API.call('/transactions?limit=10000');
-        const items = Array.isArray(transactions) ? transactions : (transactions?.items || []);
+        // Use the new centralized reset endpoint
+        const result = await window.API.call('/settings/reset-data', {
+            method: 'POST'
+        });
         
-        // Delete each transaction
-        for (const tx of items) {
-            try {
-                await window.API.call(`/transactions/${tx.id}`, {
-                    method: 'DELETE'
-                });
-            } catch (e) {
-                console.error(`Error deleting transaction ${tx.id}:`, e);
-            }
+        if (result && result.success) {
+            showAlert('Đã xóa tất cả dữ liệu thành công!', 'success');
+             // Clear Chat Session from LocalStorage
+            localStorage.removeItem('chat_session_id');
+            
+            // Reload page after 2 seconds
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } else {
+             showAlert(result?.message || 'Lỗi khi xóa dữ liệu', 'danger');
         }
-        
-        // Get all budgets and delete them
-        const budgets = await window.API.call('/budgets');
-        if (budgets && Array.isArray(budgets)) {
-            for (const budget of budgets) {
-                try {
-                    await window.API.call(`/budgets/${budget.id}`, {
-                        method: 'DELETE'
-                    });
-                } catch (e) {
-                    console.error(`Error deleting budget ${budget.id}:`, e);
-                }
-            }
-        }
-        
-        showAlert('Đã xóa tất cả dữ liệu thành công!', 'success');
-        
-        // Reload page after 2 seconds
-        setTimeout(() => {
-            window.location.reload();
-        }, 2000);
+
     } catch (error) {
         console.error('Error deleting data:', error);
-        showAlert('Lỗi khi xóa dữ liệu', 'danger');
+        showAlert('Lỗi khi xóa dữ liệu endpoint', 'danger');
     }
 }
 
