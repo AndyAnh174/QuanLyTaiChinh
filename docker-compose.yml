@@ -15,7 +15,7 @@ services:
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -28,15 +28,15 @@ services:
     image: qdrant/qdrant:latest
     container_name: finance_qdrant
     ports:
-      - "6333:6333"  # HTTP API
-      - "6334:6334"  # gRPC API
+      - "6333:6333" # HTTP API
+      - "6334:6334" # gRPC API
     volumes:
       - qdrant_data:/qdrant/storage
     environment:
       QDRANT__SERVICE__HTTP_PORT: 6333
       QDRANT__SERVICE__GRPC_PORT: 6334
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:6333/health"]
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:6333/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -54,10 +54,82 @@ services:
       - redis_data:/data
     command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redis_password}
     healthcheck:
-      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
       interval: 10s
       timeout: 3s
       retries: 5
+    networks:
+      - finance_network
+    restart: unless-stopped
+
+  # Django Web Application
+  web:
+    build: .
+    container_name: finance_web
+    command: gunicorn core.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - .:/app
+      - static_volume:/app/staticfiles
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_HOST=db
+      - DB_NAME=${DB_NAME:-finance_db}
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-password}
+      - REDIS_HOST=redis
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-redis_password}
+      - QDRANT_URL=http://qdrant:6333
+      - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,[::1]
+    depends_on:
+      - db
+      - redis
+      - qdrant
+    networks:
+      - finance_network
+    restart: unless-stopped
+
+  # Celery Worker
+  worker:
+    build: .
+    container_name: finance_worker
+    command: celery -A core worker --loglevel=info
+    volumes:
+      - .:/app
+    environment:
+      - DB_HOST=db
+      - DB_NAME=${DB_NAME:-finance_db}
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-password}
+      - REDIS_HOST=redis
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-redis_password}
+      - QDRANT_URL=http://qdrant:6333
+    depends_on:
+      - db
+      - redis
+      - web
+    networks:
+      - finance_network
+    restart: unless-stopped
+
+  # Celery Beat (Scheduler)
+  beat:
+    build: .
+    container_name: finance_beat
+    command: celery -A core beat --loglevel=info
+    volumes:
+      - .:/app
+    environment:
+      - DB_HOST=db
+      - DB_NAME=${DB_NAME:-finance_db}
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-password}
+      - REDIS_HOST=redis
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-redis_password}
+    depends_on:
+      - db
+      - redis
+      - web
     networks:
       - finance_network
     restart: unless-stopped
@@ -69,8 +141,9 @@ volumes:
     driver: local
   redis_data:
     driver: local
+  static_volume:
+    driver: local
 
 networks:
   finance_network:
     driver: bridge
-

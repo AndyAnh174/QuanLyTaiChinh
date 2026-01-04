@@ -102,23 +102,49 @@ async function exportData() {
     }
 }
 
-async function confirmDeleteData() {
-    const confirm1 = confirm('Bạn có chắc chắn muốn xóa TẤT CẢ dữ liệu?');
-    if (!confirm1) return;
+// Show Delete Modal
+function confirmDeleteData() {
+    // Reset modal state
+    const input = document.getElementById('deleteConfirmationInput');
+    const btn = document.getElementById('confirmDeleteBtn');
     
-    const confirm2 = confirm('CẢNH BÁO: Hành động này KHÔNG THỂ hoàn tác!\n\nTất cả giao dịch, ngân sách, và dữ liệu sẽ bị xóa vĩnh viễn.\n\nBạn vẫn muốn tiếp tục?');
-    if (!confirm2) return;
-    
-    const finalConfirm = prompt('Nhập "XÓA TẤT CẢ" để xác nhận:');
-    if (finalConfirm !== 'XÓA TẤT CẢ') {
-        showAlert('Đã hủy xóa dữ liệu', 'info');
-        return;
+    if (input) {
+        input.value = '';
+        input.classList.remove('is-valid', 'is-invalid');
     }
+    if (btn) btn.disabled = true;
+
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('deleteDataModal'));
+    modal.show();
+    
+    // Add real-time validation listener if not already added (simple check to avoid dupes or just re-add)
+    if (input) {
+        input.onkeyup = function() {
+            if (this.value === 'XÓA TẤT CẢ') {
+                this.classList.add('is-valid');
+                this.classList.remove('is-invalid');
+                btn.disabled = false;
+            } else {
+                this.classList.remove('is-valid');
+                // Optional: Show invalid if length is close but wrong? Nah, keep simple.
+                btn.disabled = true;
+            }
+        };
+    }
+}
+
+async function executeDeleteData() {
+    // Hide modal
+    const modalEl = document.getElementById('deleteDataModal');
+    const modal = bootstrap.Modal.getInstance(modalEl);
+    if (modal) modal.hide();
     
     try {
         showAlert('Đang xóa dữ liệu...', 'warning');
         
-        // Get all transactions and delete them
+        // Get all transactions and delete them (Backend integration)
+        // Note: Ideally backend should have a "reset" endpoint, but we loop delete here as per existing logic
         const transactions = await window.API.call('/transactions?limit=10000');
         const items = Array.isArray(transactions) ? transactions : (transactions?.items || []);
         

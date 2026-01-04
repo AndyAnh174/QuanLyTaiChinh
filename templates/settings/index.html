@@ -102,6 +102,41 @@
         </div>
     </div>
 </div>
+
+<!-- Delete Data Confirmation Modal -->
+<div class="modal fade" id="deleteDataModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-2 border-dark shadow-lg"> <!-- Explicit border for theme -->
+            <div class="modal-header bg-danger text-white border-bottom-2 border-dark">
+                <h5 class="modal-title fw-bold">
+                    <i class="bi bi-exclamation-triangle-fill"></i> CẢNH BÁO: XÓA DỮ LIỆU
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="alert alert-warning border-2 border-dark mb-4 text-dark">
+                    <strong>Hành động này KHÔNG THỂ hoàn tác!</strong><br>
+                    Tất cả giao dịch, ngân sách, và dữ liệu người dùng sẽ bị xóa vĩnh viễn khỏi hệ thống.
+                </div>
+                
+                <p class="mb-2 fw-bold">Để xác nhận, vui lòng nhập chính xác cụm từ sau:</p>
+                <div class="user-select-all bg-light border border-dark rounded p-2 mb-3 text-center fw-bold text-danger font-monospace">
+                    XÓA TẤT CẢ
+                </div>
+                
+                <div class="form-group">
+                    <input type="text" class="form-control border-2 border-dark" id="deleteConfirmationInput" placeholder="Nhập 'XÓA TẤT CẢ' tại đây..." autocomplete="off">
+                </div>
+            </div>
+            <div class="modal-footer border-top-2 border-dark bg-light">
+                <button type="button" class="btn btn-secondary border-2 border-dark fw-bold" data-bs-dismiss="modal">Hủy bỏ</button>
+                <button type="button" class="btn btn-danger border-2 border-dark fw-bold" id="confirmDeleteBtn" disabled onclick="executeDeleteData()">
+                    <i class="bi bi-trash-fill"></i> XÁC NHẬN XÓA
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_scripts %}
