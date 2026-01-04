@@ -1,4 +1,4 @@
-# AI Smart Finance
+# AI Smart Finance - Quản Lý Tài Chính Thông Minh
 
 ![Status](https://img.shields.io/badge/Status-Completed-success?style=for-the-badge)
 ![AI](https://img.shields.io/badge/AI-Gemini%20%7C%20Ollama-blue?style=for-the-badge)
@@ -8,214 +8,113 @@
 ![Vector DB](https://img.shields.io/badge/Vector_DB-Qdrant-red?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)
 
-Ứng dụng quản lý tài chính cá nhân thông minh với AI, sử dụng Django Ninja, PostgreSQL, Qdrant, Gemini, và Ollama.
+## 📖 Giới Thiệu
+**AI Smart Finance** là hệ thống quản lý tài chính cá nhân thế hệ mới, tích hợp sâu trí tuệ nhân tạo (AI) để không chỉ ghi chép mà còn phân tích, thấu hiểu và đưa ra lời khuyên tài chính cho người dùng. Dự án kết hợp sức mạnh của **Generative AI (Gemini/Ollama)** và **Vector Search (Qdrant)** để mang lại trải nghiệm tương tác tự nhiên và thông minh.
 
-**Project Info**:
-- **Author**: AndyAnh174 (Hồ Việt Anh)
-- **License**: [MIT License](LICENSE)
-- **Certificates**: [View Certificates](CERTIFICATES.md)
+- **Tác giả**: AndyAnh174 (Hồ Việt Anh)
+- **Giấy phép**: [MIT License](LICENSE)
+- **Chứng nhận**: [Xem chi tiết](CERTIFICATES.md)
 
-## Tính năng chính
+---
 
-### ✅ Đã triển khai
+## 🚀 Tính Năng Nổi Bật
 
-1. **Database Models** - Tất cả models đã được tạo:
-   - AccessCode, Wallet, Category, Transaction, Budget, RecurringTransaction
-   - Migrations đã chạy thành công
+### 🤖 Trí Tuệ Nhân Tạo (AI Features)
+- **Chat với Dữ Liệu (RAG)**: Hỏi đáp tự nhiên về tình hình tài chính (VD: "Tháng này tôi tiêu bao nhiêu cho ăn uống?", "So sánh với tháng trước").
+- **Nhập Liệu Thông Minh (NLP)**: Tạo giao dịch từ câu nói tự nhiên (VD: "Sáng nay ăn phở 35k tiền mặt").
+- **Phân Tích Chi Tiêu**: AI tự động phân loại giao dịch và phát hiện xu hướng tiêu dùng.
+- **Quét Hóa Đơn (OCR)**: Tự động trích xuất thông tin từ ảnh chụp hóa đơn (đang phát triển).
 
-2. **Access Code Protection** - Bảo vệ bằng mã truy cập:
-   - API endpoints: `/api/v1/auth/verify`, `/api/v1/auth/change`
-   - Middleware để kiểm tra access code
-   - Rate limiting chống brute force
+### 💰 Quản Lý Tài Chính (Core Features)
+- **Đa Ví & Danh Mục**: Quản lý nhiều nguồn tiền và danh mục chi tiêu tùy chỉnh.
+- **Ngân Sách Thông Minh**: Thiết lập ngân sách và nhận cảnh báo khi chi tiêu lố tay.
+- **Giao Dịch Định Kỳ**: Tự động ghi chép các khoản thu chi lặp lại (tiền nhà, lương, Netflix...).
+- **Dashboard Trực Quan**: Biểu đồ thống kê Real-time, báo cáo thu chi, dòng tiền.
 
-3. **Basic CRUD APIs** - Django Ninja APIs:
-   - Wallets, Categories, Transactions
-   - Full CRUD operations
+### 🛡️ Hệ Thống & Bảo Mật
+- **Mã Truy Cập (Access Code)**: Bảo vệ dữ liệu cá nhân với lớp bảo mật 2 lớp.
+- **An Toàn Dữ Liệu**: Sử dụng PostgreSQL mạnh mẽ và ổn định cho dữ liệu giao dịch.
 
-4. **AI Services Integration**:
-   - AI Service abstraction (Gemini/Ollama switching)
-   - Embedding Service với Redis caching
-   - NLP Service cho Quick Add by Text
-   - OCR Service cho receipt processing
+---
 
-5. **Vector Search**:
-   - Qdrant integration với batch operations
-   - Semantic search API
-   - Auto vector sync on transaction save
+## 🛠️ Công Nghệ Sử Dụng
 
-6. **Budget Management**:
-   - Budget CRUD APIs
-   - Real-time budget checking
-   - Warnings at 80%, 100%, 120% thresholds
+| Thành phần | Công nghệ | Chi tiết |
+|------------|-----------|----------|
+| **Backend** | Python, Django | Django Ninja (FastAPI-like), Celery (Async Tasks) |
+| **Frontend** | HTML5, JS | Bootstrap 5, Vanilla JS, PWA Ready |
+| **Database** | PostgreSQL | Cơ sở dữ liệu chính (Relational) |
+| **Vector DB** | Qdrant | Lưu trữ vector cho Semantic Search & RAG |
+| **Cache** | Redis | Caching & Message Broker |
+| **AI/LLM** | Gemini / Ollama | Generative AI Model & Embeddings |
 
-7. **Recurring Transactions**:
-   - CRUD APIs
-   - Celery periodic task for auto-generation
+---
 
-8. **Dashboard APIs**:
-   - Summary, category breakdown, monthly comparison, trends
-   - Redis caching for performance
+## ⚙️ Cài Đặt & Triển Khai
 
-9. **Debts & Loans**:
-   - Debt/Loan summary APIs
-   - Transaction filtering by type
+### Yêu cầu hệ thống
+- Python 3.10+
+- Docker & Docker Compose
+- API Key Google Gemini (Nếu dùng Cloud AI) hoặc Ollama (Nếu chạy Local)
 
-10. **RAG Chat**:
-    - Chat with Data API
-    - Natural language queries
+### Các bước cài đặt
 
-11. **Anomaly Detection**:
-    - Service và Celery task
-
-12. **Frontend (PWA)**:
-    - Base templates
-    - Access code UI
-    - Transaction management UI
-    - Dashboard UI
-    - Service Worker cho offline support
-
-## Cấu trúc Project
-
-```
-App-QuanLyTaiChinh/
-├── app/
-│   ├── models.py              # All Django models
-│   ├── admin.py               # Admin interfaces
-│   ├── api/                   # Django Ninja routers
-│   │   ├── auth.py
-│   │   ├── wallets.py
-│   │   ├── categories.py
-│   │   ├── transactions.py
-│   │   ├── budgets.py
-│   │   ├── recurring.py
-│   │   ├── debts.py
-│   │   ├── search.py
-│   │   ├── chat.py
-│   │   └── dashboard.py
-│   ├── services/              # Business logic
-│   │   ├── ai_service.py
-│   │   ├── embedding_service.py
-│   │   ├── nlp_service.py
-│   │   ├── ocr_service.py
-│   │   ├── vector_service.py
-│   │   ├── category_learning.py
-│   │   ├── budget_service.py
-│   │   ├── rag_service.py
-│   │   ├── anomaly_service.py
-│   │   └── sentiment_service.py
-│   ├── tasks/                 # Celery tasks
-│   │   ├── recurring_tasks.py
-│   │   ├── ocr_tasks.py
-│   │   ├── vector_tasks.py
-│   │   └── anomaly_tasks.py
-│   ├── middleware.py          # Access code middleware
-│   ├── qdrant_client.py       # Qdrant service
-│   └── management/commands/     # Management commands
-│       └── init_access_code.py
-├── templates/                  # Django templates
-│   ├── base.html
-│   ├── auth/
-│   ├── transactions/
-│   └── dashboard/
-├── static/                     # Static files
-│   ├── css/
-│   ├── js/
-│   ├── manifest.json
-│   └── sw.js
-└── core/                       # Django settings
-    ├── settings.py
-    ├── urls.py
-    └── celery.py
-```
-
-## Cài đặt và Chạy
-
-### 1. Setup Environment
-
+#### 1. Clone dự án và khởi tạo môi trường
 ```bash
-# Activate conda environment
-conda activate taichinh
+git clone https://github.com/AndyAnh174/AI-Smart-Finance.git
+cd AI-Smart-Finance
 
-# Install dependencies
-pip install -r requirements.txt
+# Tạo môi trường ảo (khuyến nghị)
+python -m venv venv
+# Windows:
+venv\Scripts\activate
+# Linux/Mac:
+source venv/bin/activate
 ```
 
-### 2. Khởi động Services
-
+#### 2. Khởi chạy Services (Docker)
+Chạy PostgreSQL, Qdrant và Redis bằng Docker Compose:
 ```bash
-# Start Docker services (PostgreSQL, Redis, Qdrant)
 docker-compose up -d
 ```
 
-### 3. Database Setup
-
+#### 3. Cài đặt thư viện và cấu hình
 ```bash
-# Run migrations
+pip install -r requirements.txt
+
+# Tạo bảng trong Database
 python manage.py migrate
 
-# Initialize access code (default: 1234)
+# Khởi tạo mã truy cập mặc định (VD: 1234)
 python manage.py init_access_code 1234
-
-# Create superuser (optional)
-python manage.py createsuperuser
 ```
 
-### 4. Chạy Server
+#### 4. Cấu hình biến môi trường
+Tạo file `.env` tại thư mục gốc và điền thông tin:
+```env
+DB_NAME=taichinh
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_HOST=localhost
+GEMINI_API_KEY=your_key_here
+```
 
+#### 5. Chạy ứng dụng
 ```bash
-# Django development server
+# Terminal 1: Chạy Web Server
 python manage.py runserver
 
-# Celery worker (in separate terminal)
+# Terminal 2: Chạy Celery Worker (Xử lý tác vụ nền)
 celery -A core worker -l info
-
-# Celery beat (in separate terminal)
-celery -A core beat -l info
 ```
+Truy cập ứng dụng tại: `http://localhost:8000`
 
-### 5. Test Connections
+---
 
-```bash
-# Test all connections
-C:\Users\ADMIN\anaconda3\envs\taichinh\python.exe test_connections.py
-```
+## 📞 Liên Hệ
+- **Developer**: Hồ Việt Anh (AndyAnh174)
+- **Email**: [Email của bạn]
+- **GitHub**: [github.com/AndyAnh174](https://github.com/AndyAnh174)
 
-## API Endpoints
-
-Tất cả APIs được document tại: `http://localhost:8000/api/v1/docs`
-
-### Main Endpoints:
-- `/api/v1/auth/*` - Access code authentication
-- `/api/v1/wallets/*` - Wallet management
-- `/api/v1/categories/*` - Category management
-- `/api/v1/transactions/*` - Transaction CRUD + Quick Add + OCR
-- `/api/v1/budgets/*` - Budget management
-- `/api/v1/recurring/*` - Recurring transactions
-- `/api/v1/debts/*` - Debts & loans
-- `/api/v1/search/semantic` - Semantic search
-- `/api/v1/chat/ask` - RAG chat
-- `/api/v1/dashboard/*` - Dashboard data
-
-## Environment Variables
-
-Cấu hình trong `.env`:
-- Database: `DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`
-- Redis: `REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD`
-- Qdrant: `QDRANT_URL`
-- AI: `GEMINI_API_KEY`, `OLLAMA_URL`
-
-## Notes
-
-- Access code mặc định: `1234` (có thể đổi bằng management command)
-- Vector size trong Qdrant: 768 (bge-m3 embedding)
-- Celery tasks cần Redis và Celery worker đang chạy
-- Frontend sử dụng PWA với Service Worker cho offline support
-
-## Next Steps
-
-- Thêm Chart.js cho dashboard visualizations
-- Hoàn thiện frontend UI/UX
-- Thêm unit tests
-- Performance optimization
-- Production deployment configuration
-
+---
+&copy; 2026 AI Smart Finance. MIT Licensed.
