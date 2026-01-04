@@ -2,7 +2,7 @@
 Chat with Data API endpoints (RAG)
 """
 from ninja import Router
-from typing import Optional
+from typing import Optional, List, Dict
 from pydantic import BaseModel
 from ..services.rag_service import rag_service
 
@@ -40,3 +40,24 @@ def ask_question(request, data: ChatRequest):
             "session_id": data.session_id
         }
 
+@router.get("/sessions/{session_id}/messages", response=List[Dict], summary="Get chat history")
+def get_history(request, session_id: int):
+    """Get all messages for a specific session"""
+    from ..models import ChatSession, ChatMessage
+    from typing import List, Dict
+    
+    try:
+        session = ChatSession.objects.get(id=session_id)
+        messages = ChatMessage.objects.filter(session=session).order_by('created_at')
+        
+        return [
+            {
+                "id": msg.id,
+                "role": msg.role,
+                "content": msg.content,
+                "created_at": msg.created_at.isoformat()
+            }
+            for msg in messages
+        ]
+    except ChatSession.DoesNotExist:
+        return []

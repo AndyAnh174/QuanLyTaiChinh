@@ -210,6 +210,11 @@ Answer:'''
                 total=Sum('amount')
             ).order_by('-total')[:5]
             
+            context['categories'] = [
+                {
+                    'name': item['category__name'],
+                    'amount': float(item['total'])
+                }
                 for item in category_breakdown
             ]
 

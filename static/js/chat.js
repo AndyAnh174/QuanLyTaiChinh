@@ -11,6 +11,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Auto focus input
     userInput.focus();
+
+    // Load History if exists
+    if (currentSessionId) {
+        loadChatHistory(currentSessionId);
+    }
     
     chatForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -140,3 +145,29 @@ function formatAIResponse(text) {
 
 // Expose sendSuggestion to window for inline onclick
 window.sendSuggestion = sendSuggestion;
+
+async function loadChatHistory(sessionId) {
+    try {
+        const response = await fetch(`/api/v1/chat/sessions/${sessionId}/messages`);
+        if (!response.ok) return;
+        
+        const messages = await response.json();
+        if (messages.length === 0) return;
+        
+        // Clear default welcome message if we have history (optional, or append)
+        // For now, let's keep welcome message but maybe clear it if there's a lot of history
+        // document.getElementById('chatMessages').innerHTML = ''; 
+        
+        messages.forEach(msg => {
+            const role = msg.role === 'assistant' ? 'ai' : msg.role;
+            // Only format if AI
+            const content = role === 'ai' ? formatAIResponse(msg.content) : msg.content;
+            addMessage(content, role);
+        });
+        
+        scrollToBottom();
+        
+    } catch (e) {
+        console.error("Error loading history", e);
+    }
+}
