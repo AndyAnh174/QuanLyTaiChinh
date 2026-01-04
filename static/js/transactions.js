@@ -251,18 +251,25 @@ async function saveQuickTransaction(txData) {
         });
         
         if (response.ok) {
-            // Show toast instead of alert
-            if (typeof showToast === 'function') {
-                showToast('Đã tạo giao dịch thành công!', 'success');
-            } else {
-                alert('Đã tạo giao dịch thành công!');
-            }
-            
-            // Remove the card from the list
+            // Success State
             const btn = document.querySelector(`button[onclick='saveQuickTransaction(${JSON.stringify(txData).replace(/"/g, '&quot;')})']`);
             if (btn) {
-                const item = btn.closest('.list-group-item');
-                if (item) item.remove();
+                const cardBody = btn.closest('.list-group-item, .card-body');
+                if (cardBody) {
+                    cardBody.innerHTML = `
+                        <div class="alert alert-success border-2 border-dark mb-0">
+                            <i class="bi bi-check-circle-fill"></i> Đã tạo giao dịch thành công!
+                        </div>
+                    `;
+                    // Auto fade out logic could go here, or just leave as confirmation
+                    setTimeout(() => {
+                        const item = cardBody.closest('.list-group-item');
+                        if (item) item.remove();
+                        else if (cardBody.closest('#uploadResults')) {
+                            document.getElementById('uploadResults').style.display = 'none';
+                        }
+                    }, 2000);
+                }
             }
             
             // Refresh dashboard data
@@ -276,15 +283,18 @@ async function saveQuickTransaction(txData) {
             }
         } else {
             const err = await response.json();
-            if (typeof showToast === 'function') {
-                showToast('Lỗi: ' + (err.message || 'Server Error'), 'error');
-            } else {
-                alert('Lỗi: ' + (err.message || 'Server Error'));
+            const btn = document.querySelector(`button[onclick='saveQuickTransaction(${JSON.stringify(txData).replace(/"/g, '&quot;')})']`);
+            if (btn) {
+                 const errorDiv = document.createElement('div');
+                 errorDiv.className = 'alert alert-danger mt-2';
+                 errorDiv.innerText = 'Lỗi: ' + (err.message || 'Server Error');
+                 btn.parentElement.appendChild(errorDiv);
+                 setTimeout(() => errorDiv.remove(), 3000);
             }
         }
     } catch (e) {
         console.error(e);
-        alert('Lỗi kết nối');
+        alert('Lỗi kết nối'); // Keep fallback or handle similarly
     }
 }
 

@@ -122,9 +122,8 @@ class AIService:
                             types.Part(
                                 inline_data=types.Blob(
                                     mime_type=mime_type,
-                                    data=image_data,  # image_data is already bytes
-                                ),
-                                media_resolution={"level": "media_resolution_high"}
+                                    data=image_data,
+                                )
                             )
                         ]
                     )
@@ -152,9 +151,8 @@ class AIService:
                             types.Part(
                                 inline_data=types.Blob(
                                     mime_type=mime_type,
-                                    data=image_data,  # image_data is already bytes
-                                ),
-                                media_resolution={"level": "media_resolution_high"}
+                                    data=image_data,
+                                )
                             )
                         ]
                     )

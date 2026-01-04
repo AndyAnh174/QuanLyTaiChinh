@@ -227,5 +227,5 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script src="{% static 'js/transactions.js' %}"></script>
+<script src="{% static 'js/transactions.js' %}?v={{ now|date:'U' }}"></script>
 {% endblock %}
