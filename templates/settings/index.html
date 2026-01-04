@@ -140,5 +140,5 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script src="{% static 'js/settings.js' %}"></script>
+<script src="{% static 'js/settings.js' %}?v={{ now|date:'U' }}"></script>
 {% endblock %}
