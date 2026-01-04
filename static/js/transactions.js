@@ -40,6 +40,24 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             processUpload();
         });
+        
+        // File Input Preview
+        const fileInput = document.getElementById('receiptFile');
+        if (fileInput) {
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const preview = document.getElementById('previewImage');
+                        const previewDiv = document.getElementById('uploadPreview');
+                        if(preview) preview.src = e.target.result;
+                        if(previewDiv) previewDiv.style.display = 'block';
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
     }
     
     // Initial Load if List is active
@@ -469,7 +487,108 @@ function formatCurrency(amount) {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
 }
 
-// Placeholder for Upload
+// Upload & OCR Logic
 async function processUpload() {
-    alert("Chức năng upload đang được bảo trì để nâng cấp.");
+    const fileInput = document.getElementById('receiptFile');
+    const file = fileInput.files[0];
+    
+    if (!file) {
+        alert("Vui lòng chọn ảnh hóa đơn!");
+        return;
+    }
+    
+    const btn = document.querySelector('#uploadReceiptForm button[type="submit"]');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Đang phân tích...';
+    btn.disabled = true;
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    try {
+        const response = await fetch('/api/v1/transactions/parse/receipt', {
+            method: 'POST',
+            body: formData
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+            renderUploadResult(result.data);
+        } else {
+            alert('Lỗi phân tích: ' + (result.error || 'Không xác định'));
+        }
+    } catch (e) {
+        console.error("Upload error", e);
+        alert('Lỗi kết nối khi upload');
+    } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+}
+
+function renderUploadResult(data) {
+    const resultDiv = document.getElementById('uploadResults');
+    resultDiv.style.display = 'block';
+    
+    // Format items list if available
+    let itemsHtml = '';
+    if (data.items && data.items.length > 0) {
+        itemsHtml = '<ul class="list-group mb-3">';
+        data.items.forEach(item => {
+            itemsHtml += `<li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>${item.desc || item.name}</span>
+                <span class="badge bg-light text-dark">${formatCurrency(item.amount || 0)}</span>
+            </li>`;
+        });
+        itemsHtml += '</ul>';
+    }
+    
+    // Serialize data for the save button
+    const txData = {
+        amount: data.amount,
+        description: data.raw_text || `Giao dịch tại ${data.merchant}`,
+        wallet_id: data.wallet_id,
+        category_id: data.category_id,
+        transaction_type: 'expense', // Default to expense for receipts
+        date: data.date,
+        contact_person: data.merchant
+    };
+    // Safe stringify for HTML attribute
+    const txString = JSON.stringify(txData).replace(/"/g, '&quot;');
+    
+    resultDiv.innerHTML = `
+        <div class="card border-2 border-dark shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-check-circle"></i> Kết quả phân tích</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <p><strong>Cửa hàng:</strong> ${data.merchant || 'Không rõ'}</p>
+                        <p><strong>Ngày:</strong> ${data.date ? new Date(data.date).toLocaleDateString('vi-VN') : 'Hôm nay'}</p>
+                    </div>
+                    <div class="col-md-6">
+                         <p><strong>Tổng tiền:</strong> <span class="h4 text-success fw-bold">${formatCurrency(data.amount)}</span></p>
+                         <p><strong>Danh mục gợi ý:</strong> <span class="badge bg-warning text-dark">${data.category || 'Khác'}</span></p>
+                    </div>
+                </div>
+                
+                ${itemsHtml ? '<h6>Chi tiết hóa đơn:</h6>' + itemsHtml : ''}
+                
+                <p class="text-muted small"><em>Mô tả tự động: ${txData.description}</em></p>
+                
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary fw-bold" onclick="saveQuickTransaction(${txString})">
+                        <i class="bi bi-save"></i> Xác nhận & Lưu Giao dịch
+                    </button>
+                    <button class="btn btn-outline-secondary" onclick="document.getElementById('uploadResults').style.display='none'">
+                        Hủy bỏ
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Scroll to results
+    resultDiv.scrollIntoView({ behavior: 'smooth' });
 }
