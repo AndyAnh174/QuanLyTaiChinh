@@ -101,5 +101,5 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script src="{% static 'js/dashboard.js' %}"></script>
+<script src="{% static 'js/dashboard.js' %}?v={{ now|date:'U'|add:'3' }}"></script>
 {% endblock %}

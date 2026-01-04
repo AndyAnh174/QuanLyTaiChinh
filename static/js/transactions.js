@@ -211,7 +211,7 @@ async function processQuickAdd() {
                             <small>${typeLabel}</small>
                         </div>
                         <p class="mb-1">Số tiền: <strong>${formatCurrency(tx.amount)}</strong> | Ví: ${tx.wallet_name} | Danh mục: ${tx.category_name}</p>
-                        <button class="btn btn-sm btn-primary mt-2" onclick="saveQuickTransaction(${txString})">
+                        <button class="btn btn-sm btn-primary mt-2" onclick="saveQuickTransaction(${txString}, this)">
                             <i class="bi bi-check"></i> Xác nhận tạo
                         </button>
                     </div>
@@ -232,7 +232,7 @@ async function processQuickAdd() {
     }
 }
 
-async function saveQuickTransaction(txData) {
+async function saveQuickTransaction(txData, btnElement) {
     const payload = {
         amount: txData.amount.toString(),
         description: txData.description,
@@ -252,7 +252,8 @@ async function saveQuickTransaction(txData) {
         
         if (response.ok) {
             // Success State
-            const btn = document.querySelector(`button[onclick='saveQuickTransaction(${JSON.stringify(txData).replace(/"/g, '&quot;')})']`);
+            // Use passed element or fallback (though fallback is fragile)
+            const btn = btnElement || document.querySelector(`button[onclick='saveQuickTransaction(${JSON.stringify(txData).replace(/"/g, '&quot;')})']`);
             if (btn) {
                 const cardBody = btn.closest('.list-group-item, .card-body');
                 if (cardBody) {
@@ -283,7 +284,7 @@ async function saveQuickTransaction(txData) {
             }
         } else {
             const err = await response.json();
-            const btn = document.querySelector(`button[onclick='saveQuickTransaction(${JSON.stringify(txData).replace(/"/g, '&quot;')})']`);
+            const btn = btnElement || document.querySelector(`button[onclick='saveQuickTransaction(${JSON.stringify(txData).replace(/"/g, '&quot;')})']`);
             if (btn) {
                  const errorDiv = document.createElement('div');
                  errorDiv.className = 'alert alert-danger mt-2';
@@ -588,7 +589,7 @@ function renderUploadResult(data) {
                 <p class="text-muted small"><em>Mô tả tự động: ${txData.description}</em></p>
                 
                 <div class="d-grid gap-2">
-                    <button class="btn btn-primary fw-bold" onclick="saveQuickTransaction(${txString})">
+                    <button class="btn btn-primary fw-bold" onclick="saveQuickTransaction(${txString}, this)">
                         <i class="bi bi-save"></i> Xác nhận & Lưu Giao dịch
                     </button>
                     <button class="btn btn-outline-secondary" onclick="document.getElementById('uploadResults').style.display='none'">

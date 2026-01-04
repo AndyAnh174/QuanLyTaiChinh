@@ -9,19 +9,23 @@ from .ai_service import ai_service
 from ..models import Transaction, Budget, Category
 
 
+from ..data.app_docs import APP_FEATURES
+
 class RAGService:
     """
     Service for querying financial data and generating natural language responses
     """
     
-    SYSTEM_PROMPT = """You are a helpful financial assistant. Answer questions about personal finances based on the provided data.
+    SYSTEM_PROMPT = """You are a helpful financial assistant for the 'AI Smart Finance' application. 
+Answer questions about personal finances based on the provided data, and explain app features using the provided documentation.
 
 Rules:
-1. Be concise and friendly
-2. Use Vietnamese language
-3. Format numbers with commas (e.g., 1,000,000 VNĐ)
-4. If data is not available, say so clearly
-5. Provide actionable insights when possible
+1. Be concise, friendly, and helpful.
+2. Use Vietnamese language.
+3. Format numbers with commas (e.g., 1,000,000 VNĐ).
+4. If data is not available, say so clearly.
+5. If the user asks about app functions, use the 'System Documentation' section.
+6. Provide actionable insights when possible.
 
 Data provided will be in JSON format. Use it to answer the user's question accurately."""
 
@@ -42,7 +46,17 @@ Data provided will be in JSON format. Use it to answer the user's question accur
         context_text = self._format_context(data_context)
         
         # Generate response using AI
-        prompt = f"Question: {question}\n\nData: {context_text}\n\nAnswer:"
+        # Combined prompt with App Documentation and User Data
+        prompt = f'''Question: {question}
+
+--- SYSTEM DOCUMENTATION (Features & Tech Stack) ---
+{APP_FEATURES}
+
+--- USER FINANCIAL DATA (JSON) ---
+{context_text}
+
+Answer:'''
+        
         response = ai_service.generate_text(prompt, self.SYSTEM_PROMPT)
         
         return response

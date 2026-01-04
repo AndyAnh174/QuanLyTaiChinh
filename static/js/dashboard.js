@@ -12,19 +12,19 @@ window.loadDashboardData = loadDashboardData;
 async function loadDashboardData() {
     try {
         // Load summary
-        const summary = await window.API.call('/dashboard/summary');
+        const summary = await window.API.call(`/dashboard/summary?v=${Date.now()}`);
         if (summary) {
             displaySummary(summary);
         }
         
         // Load category breakdown
-        const breakdown = await window.API.call('/dashboard/category-breakdown');
+        const breakdown = await window.API.call(`/dashboard/category-breakdown?v=${Date.now()}`);
         if (breakdown) {
             displayCategoryBreakdown(breakdown);
         }
         
         // Load monthly comparison
-        const monthly = await window.API.call('/dashboard/monthly-comparison?months=6');
+        const monthly = await window.API.call(`/dashboard/monthly-comparison?months=6&v=${Date.now()}`);
         if (monthly) {
             displayMonthlyComparison(monthly);
         }
@@ -104,7 +104,8 @@ function displaySummary(data) {
     
     if (incomeEl) incomeEl.textContent = '+' + formatCurrency(data.total_income);
     if (expenseEl) expenseEl.textContent = '-' + formatCurrency(data.total_expense);
-    if (balanceEl) balanceEl.textContent = formatCurrency(data.balance);
+    // Use current_balance (Total Wallet Balance) instead of period balance (Net Income)
+    if (balanceEl) balanceEl.textContent = formatCurrency(data.current_balance);
 }
 
 function displayCategoryBreakdown(data) {

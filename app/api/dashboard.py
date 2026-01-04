@@ -40,38 +40,31 @@ def get_summary(request, start_date: str = None, end_date: str = None):
     """
     Get total income, expense, balance, and transaction count
     """
-    # Parse dates or use defaults (current month)
-    if start_date:
-        start = datetime.fromisoformat(start_date)
-    else:
-        start = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-    
-    if end_date:
-        end = datetime.fromisoformat(end_date)
-    else:
-        end = timezone.now()
-    
-    
     # Calculate totals
     # No caching for real-time updates
     
+    # Base Query
+    tx_qs = Transaction.objects.all()
+    
+    # Apply date filters ONLY if provided
+    if start_date:
+        start = datetime.fromisoformat(start_date)
+        tx_qs = tx_qs.filter(date__gte=start)
+    
+    if end_date:
+        end = datetime.fromisoformat(end_date)
+        tx_qs = tx_qs.filter(date__lte=end)
+    elif not start_date:
+         # If neither provided (default view), do NOT filter by date => All Time
+         pass
+    else:
+         # If start provided but no end, default to now
+         tx_qs = tx_qs.filter(date__lte=timezone.now())
+
     # Calculate totals
-    income = Transaction.objects.filter(
-        transaction_type='income',
-        date__gte=start,
-        date__lte=end
-    ).aggregate(Sum('amount'))['amount__sum'] or 0
-    
-    expense = Transaction.objects.filter(
-        transaction_type='expense',
-        date__gte=start,
-        date__lte=end
-    ).aggregate(Sum('amount'))['amount__sum'] or 0
-    
-    count = Transaction.objects.filter(
-        date__gte=start,
-        date__lte=end
-    ).count()
+    income = tx_qs.filter(transaction_type='income').aggregate(Sum('amount'))['amount__sum'] or 0
+    expense = tx_qs.filter(transaction_type='expense').aggregate(Sum('amount'))['amount__sum'] or 0
+    count = tx_qs.count()
     
     # Tính tổng số dư từ các ví
     wallets = Wallet.objects.all()
@@ -99,27 +92,29 @@ def get_category_breakdown(request, start_date: str = None, end_date: str = None
     """
     Get spending breakdown by category for pie chart
     """
-    # Parse dates
+    # Base Query
+    tx_qs = Transaction.objects.filter(
+        transaction_type='expense',
+        category__isnull=False
+    )
+    
+    # Apply date filters ONLY if provided
     if start_date:
         start = datetime.fromisoformat(start_date)
-    else:
-        start = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        tx_qs = tx_qs.filter(date__gte=start)
     
     if end_date:
         end = datetime.fromisoformat(end_date)
+        tx_qs = tx_qs.filter(date__lte=end)
+    elif not start_date:
+         # If neither provided (default view), do NOT filter by date => All Time
+         pass
     else:
-        end = timezone.now()
-    
-    
-    # No caching for real-time updates
-    
+         # If start provided but no end, default to now
+         tx_qs = tx_qs.filter(date__lte=timezone.now())
+
     # Aggregate by category
-    transactions = Transaction.objects.filter(
-        transaction_type='expense',
-        date__gte=start,
-        date__lte=end,
-        category__isnull=False
-    ).values('category__name').annotate(
+    transactions = tx_qs.values('category__name').annotate(
         total=Sum('amount')
     ).order_by('-total')
     
